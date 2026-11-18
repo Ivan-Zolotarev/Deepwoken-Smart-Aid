@@ -1,0 +1,206 @@
+/* Типографика внутри страницы */
+.page h1, .page h2, .page h3 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  line-height: 1.15;
+  margin: 0 0 .5em;
+}
+.page h1 {
+  font-size: var(--fs-4);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.page h2 { font-size: var(--fs-3); margin-top: 1.6em; }
+.page h3 { font-size: var(--fs-2); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+.page p { margin: 0 0 1em; }
+.page a { color: #1d6e67; text-underline-offset: 3px; }
+.page a:hover { color: #0f4a45; }
+
+.page .eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  font-size: var(--fs-0);
+  color: var(--gold-dim);
+}
+
+.lead { font-size: var(--fs-2); }
+.lead::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 3.6em;
+  line-height: .85;
+  padding: 4px 10px 0 0;
+  color: var(--gold-dim);
+}
+
+/* Орнамент-разделитель */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.6em 0;
+  color: var(--gold-dim);
+}
+.ornament::before, .ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+/* Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: var(--leather-0);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-2);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 0 var(--rune-glow), 0 4px 0 var(--gold-dim);
+  transition: transform .15s, box-shadow .2s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 22px 2px var(--rune-glow), 0 4px 0 var(--gold-dim);
+}
+.page .btn, .page .btn:hover { color: var(--leather-0); }
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--gold-dim);
+  box-shadow: none;
+}
+.page .btn--ghost { color: var(--ink); }
+
+/* Сетка и карточки */
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.card {
+  position: relative;
+  display: block;
+  padding: 18px 18px 16px;
+  text-decoration: none;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .15));
+  border: 1px solid var(--parchment-2);
+  border-top: 3px solid var(--gold-dim);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+a.card:hover {
+  transform: translateY(-3px);
+  border-top-color: var(--rune);
+  box-shadow: var(--shadow-card), 0 0 0 1px var(--rune-glow), 0 8px 24px var(--rune-glow);
+}
+.page a.card, .page a.card:hover { color: var(--ink); text-decoration: none; }
+.card__glyph { font-size: 1.8rem; color: var(--gold-dim); line-height: 1; }
+.card__title {
+  margin: 8px 0 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-3);
+}
+.card__text { margin: 0; font-size: var(--fs-0); color: var(--ink-soft); }
+
+/* Теги и бейджи */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-0);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink-soft);
+  border: 1px solid var(--ink-faint);
+  background: rgba(255, 255, 255, .3);
+}
+.tag--stage { color: #0f4a45; border-color: #1d6e67; }
+
+/* Чип школы: цвет задаётся через --c */
+.school {
+  --c: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 8px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--ink);
+  border: 1px solid var(--c);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+}
+.school::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10px var(--c);
+}
+.school--flamecharm   { --c: var(--school-flamecharm); }
+.school--frostdraw    { --c: var(--school-frostdraw); }
+.school--thundercall  { --c: var(--school-thundercall); }
+.school--galebreathe  { --c: var(--school-galebreathe); }
+.school--shadowcast   { --c: var(--school-shadowcast); }
+.school--ironsing     { --c: var(--school-ironsing); }
+.school--bloodrend    { --c: var(--school-bloodrend); }
+
+/* Выноска */
+.callout {
+  margin: 1.2em 0;
+  padding: 14px 18px;
+  border-left: 4px solid var(--rune);
+  background: rgba(95, 208, 196, .12);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.callout--warn { border-color: var(--warn); background: rgba(181, 118, 42, .14); }
+.callout strong { font-family: var(--font-display); letter-spacing: .04em; }
+
+/* Список планов */
+.plan { padding-left: 1.2em; }
+.plan li { margin-bottom: .35em; }
+.plan li::marker { color: var(--gold-dim); }
+
+/* Палитра в styleguide */
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch {
+  width: 110px;
+  font-size: .75rem;
+  color: var(--ink-soft);
+}
+.swatch i {
+  display: block;
+  height: 46px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, .25);
+  margin-bottom: 4px;
+}
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* Колонки внутри разворота не разрываем */
+.page--spread > section { break-inside: avoid; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

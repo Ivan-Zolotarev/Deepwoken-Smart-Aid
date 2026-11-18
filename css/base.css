@@ -1,0 +1,99 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--parchment-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-1);
+  line-height: 1.65;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(95, 208, 196, .08), transparent 60%),
+    radial-gradient(900px 500px at 90% 110%, rgba(201, 162, 75, .06), transparent 60%),
+    var(--bg-0);
+}
+
+img, svg { max-width: 100%; }
+
+a { color: inherit; }
+
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--rune);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  z-index: 100;
+  padding: 8px 14px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: var(--radius);
+}
+.skip:focus { left: 8px; }
+
+.desk {
+  max-width: var(--book-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) 32px;
+}
+
+/* Верхняя панель */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 4px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--gold-bright);
+}
+.brand__mark { width: 30px; height: 30px; flex: none; }
+.brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.brand__name em { font-style: normal; color: var(--rune); }
+
+.lang {
+  display: inline-flex;
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lang button {
+  background: transparent;
+  border: 0;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--gold);
+}
+.lang button[aria-pressed="true"] {
+  background: var(--gold);
+  color: var(--leather-0);
+}
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: var(--fs-0);
+  color: var(--ink-faint);
+}

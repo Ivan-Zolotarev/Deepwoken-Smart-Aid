@@ -1,0 +1,62 @@
+window.LANGS = window.LANGS || {};
+window.LANGS.en = {
+  "a11y.skip": "Skip to content",
+  "footer.license": "Game data: Deepwoken Wiki (Fandom), CC BY-SA. Unofficial project, not affiliated with Deepwoken.",
+
+  "nav.talents": "Talents",
+  "nav.quests": "Quests",
+  "nav.islands": "Islands",
+  "nav.beginners": "Beginners",
+  "nav.builds": "Builds",
+  "nav.reference": "Reference",
+  "nav.assistant": "Assistant",
+
+  "home.kicker": "Smart guide",
+  "home.title": "Deepwoken",
+  "home.subtitle": "Talents, quests, islands and builds in one book",
+  "home.open": "Open the book",
+  "home.styleguide": "Design system",
+
+  "contents.eyebrow": "Contents",
+  "contents.title": "Chapter by chapter",
+  "contents.lead": "Everything you need in the Depths: talent breakdowns, quest walkthroughs, island guides, beginner tips and an assistant that answers questions and helps assemble a build.",
+  "contents.note": "The book is a work in progress. Sections open as they are ready.",
+
+  "stage": "Stage",
+  "soon.title": "This section opens soon",
+  "soon.text": "The pages of this section are not written yet. Here is what will appear:",
+  "notfound.title": "Page lost",
+  "notfound.text": "There is no such page in the book.",
+  "notfound.back": "Back to contents",
+
+  "sec.talents.desc": "Talent catalog with filters and links.",
+  "sec.quests.desc": "All quests by island and NPC.",
+  "sec.islands.desc": "Locations, NPCs, bosses and loot.",
+  "sec.beginners.desc": "First hours and common mistakes.",
+  "sec.builds.desc": "Ready archetypes and a builder.",
+  "sec.reference.desc": "Weapons, mantras, mutations, races.",
+  "sec.assistant.desc": "Ask a question or get a build.",
+
+  "plan.talents": ["Search and filters by category, rarity, requirements", "Talent card with related talents", "Russian descriptions and original names"],
+  "plan.quests": ["Quests by island and NPC", "Step-by-step walkthroughs", "Rewards and requirements"],
+  "plan.islands": ["Map and island descriptions", "NPCs, bosses, loot, hazards"],
+  "plan.beginners": ["First hours in the game", "Common mistakes", "Glossary", "Starter builds"],
+  "plan.builds": ["Ready archetypes", "Builder: stats, talents, requirements", "Share a build by link"],
+  "plan.reference": ["Weapons", "Mantras", "Mutations", "Races and gear"],
+  "plan.assistant": ["Knowledge base search", "Build recommendations from questions", "Chat answering from the knowledge base"],
+
+  "sg.eyebrow": "Design system",
+  "sg.title": "Tome of the Depths",
+  "sg.lead": "Leather cover, parchment pages, gold embossing and the cold glow of runes. These are the elements the whole site is built from.",
+  "sg.colors": "Colors",
+  "sg.schools": "Schools of magic",
+  "sg.buttons": "Buttons and tags",
+  "sg.cards": "Cards",
+  "sg.callouts": "Callouts",
+  "sg.callout.info": "Tip: this is how beginner advice looks.",
+  "sg.callout.warn": "Warning: this is how mistakes and traps are flagged.",
+  "sg.card.sample.title": "Talent name",
+  "sg.card.sample.text": "A short description in a line or two.",
+  "sg.btn.primary": "Open",
+  "sg.btn.ghost": "Details"
+};

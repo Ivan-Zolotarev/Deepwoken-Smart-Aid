@@ -1,0 +1,62 @@
+/* Дизайн-токены: «Фолиант Глубин» (книга) + «гримуар» (тёмный фон, руны) */
+:root {
+  /* Стол / фон (гримуар) */
+  --bg-0: #0b0d12;
+  --bg-1: #12151d;
+  --bg-2: #1a1e29;
+  --line: #2a3040;
+
+  /* Кожа обложки */
+  --leather-0: #1a0f0a;
+  --leather-1: #2a1a12;
+  --leather-2: #3b2417;
+  --leather-3: #52331f;
+
+  /* Золото тиснения */
+  --gold: #c9a24b;
+  --gold-bright: #e8c874;
+  --gold-dim: #8c6f31;
+
+  /* Пергамент и чернила */
+  --parchment-0: #efe4c6;
+  --parchment-1: #e6d6ae;
+  --parchment-2: #d6c294;
+  --ink: #2b1f14;
+  --ink-soft: #5a4632;
+  --ink-faint: #8a7658;
+
+  /* Руны / акценты (глубинная вода) */
+  --rune: #5fd0c4;
+  --rune-glow: rgba(95, 208, 196, .35);
+  --blood: #8a2a2a;
+  --warn: #b5762a;
+
+  /* Школы (предварительные цвета, уточним на этапе 2) */
+  --school-flamecharm: #d9602b;
+  --school-frostdraw: #5aa6d6;
+  --school-thundercall: #c9b030;
+  --school-galebreathe: #5fbf9a;
+  --school-shadowcast: #7a5cc2;
+  --school-ironsing: #8a94a3;
+  --school-bloodrend: #b0303a;
+
+  /* Типографика */
+  --font-display: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+  --font-body: "PT Serif", "Georgia", "Times New Roman", serif;
+
+  --fs-0: .875rem;
+  --fs-1: 1rem;
+  --fs-2: 1.125rem;
+  --fs-3: 1.5rem;
+  --fs-4: 2.25rem;
+  --fs-5: clamp(2.5rem, 6vw, 4.25rem);
+
+  /* Размеры и ритм */
+  --gutter: 16px;
+  --radius: 6px;
+  --book-max: 1180px;
+  --spine-w: 28px;
+
+  --shadow-page: 0 24px 60px rgba(0, 0, 0, .55), 0 2px 0 rgba(255, 255, 255, .04) inset;
+  --shadow-card: 0 2px 0 rgba(255, 255, 255, .35) inset, 0 6px 14px rgba(43, 31, 20, .18);
+}
