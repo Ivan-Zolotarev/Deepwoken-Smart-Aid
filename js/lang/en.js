@@ -1,6 +1,7 @@
 window.LANGS = window.LANGS || {};
 window.LANGS.en = {
   "a11y.skip": "Skip to content",
+  "footer.report": "Found a mistake or an inaccurate translation? Write to:",
   "footer.license": "Game data: Deepwoken Wiki (Fandom), CC BY-SA. Unofficial project, not affiliated with Deepwoken.",
 
   "nav.talents": "Talents",
@@ -49,6 +50,8 @@ window.LANGS.en = {
   "talents.untranslated.note": "Not translated yet.",
   "talents.show.original": "Show original",
   "talents.show.translation": "Show translation",
+  "talents.report": "Found a wrong translation? Write to us:",
+  "talents.report.subject": "Translation error",
   "talents.source": "Source:",
 
   "stage": "Stage",

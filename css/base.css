@@ -97,3 +97,5 @@ button { font: inherit; color: inherit; }
   font-size: var(--fs-0);
   color: var(--ink-faint);
 }
+.footer a { color: var(--gold); text-underline-offset: 3px; }
+.footer a:hover { color: var(--gold-bright); }

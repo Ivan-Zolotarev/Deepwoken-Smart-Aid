@@ -2,6 +2,7 @@
 (function () {
   var I18N = window.I18N;
   var PAGE_SIZE = 60;
+  var CONTACT = "cryptoknopka1@gmail.com"; // куда писать об ошибках в переводе
   // Стат-требования, по которым имеет смысл фильтровать (остальное в вики — текстовые условия)
   var STAT_FILTER = [
     "Strength", "Fortitude", "Agility", "Intelligence", "Willpower", "Charisma",
@@ -267,6 +268,8 @@
             return '<a class="tag tag--link" href="#/talents/' + o.slug + '">' + esc(o.name) + '</a>';
           }).join("") + '</div>' : "") +
         '<div class="ornament" aria-hidden="true">❖</div>' +
+        (hasTr ? '<p class="source">' + esc(t("talents.report")) + ' <a href="mailto:' + CONTACT +
+          '?subject=' + encodeURIComponent(t("talents.report.subject") + ": " + x.name) + '">' + CONTACT + '</a></p>' : "") +
         '<p class="source">' + esc(t("talents.source")) + ' <a href="' + esc(x.wiki_url) + '" target="_blank" rel="noopener">Deepwoken Wiki</a> (CC BY-SA 3.0).</p>' +
         '<p><a class="btn btn--ghost" href="#/talents">← ' + esc(t("talents.back")) + '</a></p>',
       afterRender: function (root) {

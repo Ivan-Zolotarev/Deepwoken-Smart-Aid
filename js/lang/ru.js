@@ -1,6 +1,7 @@
 window.LANGS = window.LANGS || {};
 window.LANGS.ru = {
   "a11y.skip": "К содержимому",
+  "footer.report": "Нашли ошибку или неточный перевод? Напишите:",
   "footer.license": "Данные игры: Deepwoken Wiki (Fandom), CC BY-SA. Проект неофициальный и не связан с Deepwoken.",
 
   "nav.talents": "Таланты",
@@ -49,6 +50,8 @@ window.LANGS.ru = {
   "talents.untranslated.note": "Перевод этого таланта пока не готов, показан английский оригинал.",
   "talents.show.original": "Показать оригинал",
   "talents.show.translation": "Показать перевод",
+  "talents.report": "Нашли неверный перевод? Напишите нам:",
+  "talents.report.subject": "Ошибка в переводе",
   "talents.source": "Источник:",
   "rarity.Common": "Обычный",
   "rarity.Rare": "Редкий",
