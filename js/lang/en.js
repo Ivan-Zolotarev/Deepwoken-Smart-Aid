@@ -45,6 +45,10 @@ window.LANGS.en = {
   "talents.details": "Details",
   "talents.related": "From the same category",
   "talents.back": "Back to catalog",
+  "talents.untranslated": "Not translated yet",
+  "talents.untranslated.note": "Not translated yet.",
+  "talents.show.original": "Show original",
+  "talents.show.translation": "Show translation",
   "talents.source": "Source:",
 
   "stage": "Stage",

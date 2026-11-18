@@ -14,6 +14,8 @@
   var bySlug = {};
   var options = null;       // значения для фильтров
   var loading = null;
+  var ru = { translations: {}, glossary: {} };   // русские переводы и словарь терминов
+  var showOriginal = false;                      // в карточке: показать английский оригинал
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -30,7 +32,32 @@
     return v === k ? key : v;
   }
 
+  function isRu() { return I18N.lang === "ru"; }
+  // Перевод таланта для текущего языка или null
+  function trans(x) { return isRu() ? (ru.translations[x.slug] || null) : null; }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // Термин по словарю: «Passive Agility» -> «Пассивная Ловкость» (только в русском интерфейсе)
+  function term(s) {
+    if (!isRu()) return s;
+    var plus = s.charAt(0) === "+" ? "+" : "";
+    var v = ru.glossary[plus ? s.slice(1) : s];
+    return v ? plus + cap(v) : s;
+  }
+
+  var STAT_NAMES = ["Strength", "Fortitude", "Agility", "Intelligence", "Willpower", "Charisma",
+    "Light Weapon", "Medium Weapon", "Heavy Weapon"];
+  var statRe = new RegExp("\\b(" + STAT_NAMES.join("|") + ")\\b", "g");
+
+  // Названия статов внутри строки требований: «65 Willpower» -> «65 Сила воли»
+  function reqText(raw) {
+    if (!isRu()) return raw;
+    return raw.replace(statRe, function (m) { return ru.glossary[m] ? cap(ru.glossary[m]) : m; });
+  }
+
   function init() {
+    if (window.DEEPWOKEN_DATA.ru) ru = window.DEEPWOKEN_DATA.ru;
     var payload = window.DEEPWOKEN_DATA.talents;
     data = payload.talents;
     var rar = {}, cat = {}, tag = {};
@@ -38,7 +65,9 @@
       x.slug = slugify(x.name);
       x.rarityKey = x.rarity || "Equipment";
       x.statNames = x.requirements.stats.map(function (s) { return s.stat; });
-      x.hay = (x.name + " " + x.description + " " + x.category + " " + x.tags.join(" ")).toLowerCase();
+      var tr = ru.translations[x.slug];
+      x.hay = (x.name + " " + x.description + " " + x.category + " " + x.tags.join(" ") +
+        (tr ? " " + tr.description : "")).toLowerCase();
       bySlug[x.slug] = x;
       rar[x.rarityKey] = (rar[x.rarityKey] || 0) + 1;
       if (x.category) cat[x.category] = 1;
@@ -55,11 +84,20 @@
     if (data) return Promise.resolve();
     if (!loading) {
       loading = new Promise(function (resolve, reject) {
-        var s = document.createElement("script");
-        s.src = "data/talents.js";
-        s.onload = function () { init(); resolve(); };
-        s.onerror = function () { loading = null; reject(new Error("talents.js")); };
-        document.head.appendChild(s);
+        var addScript = function (src, ok, fail) {
+          var s = document.createElement("script");
+          s.src = src;
+          s.onload = ok;
+          s.onerror = fail;
+          document.head.appendChild(s);
+        };
+        var loadTalents = function () {
+          addScript("data/talents.js",
+            function () { init(); resolve(); },
+            function () { loading = null; reject(new Error("talents.js")); });
+        };
+        // Переводы необязательны: если файла нет, показываем оригинал
+        addScript("data/talents.ru.js", loadTalents, loadTalents);
       });
     }
     return loading;
@@ -86,12 +124,15 @@
   }
 
   function cardHtml(x) {
-    var req = x.requirements.raw ? '<p class="card__req">' + esc(x.requirements.raw) + '</p>' : "";
+    var tr = trans(x);
+    var req = x.requirements.raw ? '<p class="card__req">' + esc(reqText(x.requirements.raw)) + '</p>' : "";
+    var untranslated = isRu() && !tr
+      ? ' <span class="tag tag--en" title="' + esc(t("talents.untranslated")) + '">EN</span>' : "";
     return '<a class="card card--talent" href="#/talents/' + x.slug + '">' +
-      '<span class="tag rarity rarity--' + slugify(x.rarityKey) + '">' + esc(rarityLabel(x.rarityKey)) + '</span>' +
+      '<span class="tag rarity rarity--' + slugify(x.rarityKey) + '">' + esc(rarityLabel(x.rarityKey)) + '</span>' + untranslated +
       '<h3 class="card__title">' + esc(x.name) + '</h3>' +
       (x.category ? '<p class="card__cat">' + esc(x.category) + '</p>' : "") +
-      '<p class="card__text card__text--clamp">' + esc(x.description) + '</p>' + req +
+      '<p class="card__text card__text--clamp">' + esc(tr ? tr.description : x.description) + '</p>' + req +
     '</a>';
   }
 
@@ -121,8 +162,8 @@
             '<input type="search" id="t-q" value="' + esc(state.q) + '" placeholder="' + esc(t("talents.search.ph")) + '" autocomplete="off"></label>' +
           selectHtml("t-rarity", t("talents.rarity"), options.rarities, state.rarity, rarityLabel) +
           selectHtml("t-category", t("talents.category"), options.categories, state.category) +
-          selectHtml("t-tag", t("talents.tag"), options.tags, state.tag) +
-          selectHtml("t-stat", t("talents.stat"), statValues, state.stat) +
+          selectHtml("t-tag", t("talents.tag"), options.tags, state.tag, term) +
+          selectHtml("t-stat", t("talents.stat"), statValues, state.stat, term) +
           '<button type="button" class="btn btn--ghost btn--sm" id="t-reset">' + esc(t("talents.reset")) + '</button>' +
         '</form>' +
         '<div id="t-results">' + resultsHtml() + '</div>',
@@ -174,13 +215,29 @@
     return '<h2>' + esc(t("talents.details")) + '</h2><div class="info-list">' + html + "</div>";
   }
 
+  // Плашка о языке текста и кнопка «Показать оригинал / перевод»
+  function langNote(hasTr, showingTr) {
+    if (!isRu()) return "";
+    if (!hasTr) return '<div class="callout callout--warn">' + esc(t("talents.untranslated.note")) + '</div>';
+    return '<p class="langnote"><button type="button" class="linkbtn" id="t-toggle">' +
+      esc(showingTr ? t("talents.show.original") : t("talents.show.translation")) + '</button></p>';
+  }
+
   function detailView(slug) {
     var x = bySlug[decodeURIComponent(slug)];
     if (!x) return null;
 
+    var hasTr = !!trans(x);
+    var tr = showOriginal ? null : trans(x);
+    var infoItems = tr ? x.info.map(function (it, i) {
+      return { level: it.level, text: tr.info[i] != null ? tr.info[i] : it.text };
+    }) : x.info;
+    var description = tr ? tr.description : x.description;
+    var bonus = tr && tr.stats ? tr.stats : x.stats;
+
     var rows = [];
-    if (x.requirements.raw) rows.push([t("talents.requirements"), x.requirements.raw]);
-    if (x.stats) rows.push([t("talents.bonus"), x.stats]);
+    if (x.requirements.raw) rows.push([t("talents.requirements"), reqText(x.requirements.raw)]);
+    if (bonus) rows.push([t("talents.bonus"), bonus]);
     if (x.equipment) rows.push([t("talents.equipment"), x.equipment]);
     if (x.extra && x.extra.mutual_exclusives) rows.push([t("talents.exclusive"), x.extra.mutual_exclusives]);
     if (x.extra && x.extra.condition) rows.push([t("talents.condition"), x.extra.condition]);
@@ -197,21 +254,28 @@
         '<h1>' + esc(x.name) + '</h1>' +
         '<div class="row">' +
           '<span class="tag rarity rarity--' + slugify(x.rarityKey) + '">' + esc(rarityLabel(x.rarityKey)) + '</span>' +
-          x.tags.map(function (g) { return '<span class="tag">' + esc(g) + '</span>'; }).join("") +
-        '</div>' +
+          x.tags.map(function (g) { return '<span class="tag">' + esc(term(g)) + '</span>'; }).join("") +
+        '</div>' + langNote(hasTr, !!tr) +
         '<div class="ornament" aria-hidden="true">❖</div>' +
-        '<p class="lead lead--plain">' + esc(x.description) + '</p>' +
+        '<p class="lead lead--plain">' + esc(description) + '</p>' +
         (rows.length ? '<dl class="meta">' + rows.map(function (r) {
           return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>';
         }).join("") + '</dl>' : "") +
-        infoHtml(x.info) +
+        infoHtml(infoItems) +
         (related.length ? '<h2>' + esc(t("talents.related")) + '</h2><div class="row">' +
           related.map(function (o) {
             return '<a class="tag tag--link" href="#/talents/' + o.slug + '">' + esc(o.name) + '</a>';
           }).join("") + '</div>' : "") +
         '<div class="ornament" aria-hidden="true">❖</div>' +
         '<p class="source">' + esc(t("talents.source")) + ' <a href="' + esc(x.wiki_url) + '" target="_blank" rel="noopener">Deepwoken Wiki</a> (CC BY-SA 3.0).</p>' +
-        '<p><a class="btn btn--ghost" href="#/talents">← ' + esc(t("talents.back")) + '</a></p>'
+        '<p><a class="btn btn--ghost" href="#/talents">← ' + esc(t("talents.back")) + '</a></p>',
+      afterRender: function (root) {
+        var b = root.querySelector("#t-toggle");
+        if (b) b.addEventListener("click", function () {
+          showOriginal = !showOriginal;
+          document.dispatchEvent(new CustomEvent("langchange")); // перерисовать страницу
+        });
+      }
     };
   }
 

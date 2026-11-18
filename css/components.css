@@ -308,6 +308,20 @@ a.card:hover {
 .info-list li::marker { color: var(--gold-dim); }
 .source { font-size: var(--fs-0); color: var(--ink-soft); }
 
+.tag--en { margin-left: 4px; font-size: .7rem; padding: 0 7px; color: var(--ink-faint); border-color: var(--ink-faint); }
+.langnote { margin: 1em 0 0; font-size: var(--fs-0); }
+.linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #1d6e67;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.linkbtn:hover { color: #0f4a45; }
+
 /* Колонки внутри разворота не разрываем */
 .page--spread > section { break-inside: avoid; }
 
