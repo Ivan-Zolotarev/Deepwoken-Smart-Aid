@@ -5,9 +5,11 @@
   var nav = document.getElementById("nav");
   var view = document.getElementById("view");
 
+  // "#/talents/some-slug" -> { name: "talents", arg: "some-slug" }
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, "");
-    return h || "";
+    var i = h.indexOf("/");
+    return i === -1 ? { name: h, arg: "" } : { name: h.slice(0, i), arg: h.slice(i + 1) };
   }
 
   function renderNav(route) {
@@ -21,7 +23,8 @@
   }
 
   function render(focus) {
-    var route = currentRoute();
+    var r = currentRoute();
+    var route = r.name;
     var page;
 
     // Обложка занимает место книги целиком
@@ -36,7 +39,20 @@
     }
 
     var section = P.SECTIONS.filter(function (s) { return s.id === route; })[0];
-    if (route === "contents") page = P.contents();
+    if (route === "talents") {
+      page = window.TALENTS_VIEW.render(r.arg);
+      if (!page) {
+        page = { title: I18N.t("nav.talents"), html: '<p class="loading">' + I18N.t("loading") + "</p>" };
+        window.TALENTS_VIEW.load().then(function () {
+          if (currentRoute().name === "talents") render(focus);
+        }, function () {
+          if (currentRoute().name === "talents") {
+            view.innerHTML = '<div class="callout callout--warn">' + I18N.t("load.error") + "</div>";
+          }
+        });
+      }
+    }
+    else if (route === "contents") page = P.contents();
     else if (route === "styleguide") page = P.styleguide();
     else if (section) page = P.soon(section);
     else page = P.notFound();
@@ -50,6 +66,7 @@
     view = document.getElementById("view");
 
     renderNav(route);
+    if (page.afterRender) page.afterRender(view);
     document.title = page.title + " — Deepwoken Smart Aid";
     if (focus) {
       window.scrollTo(0, 0);

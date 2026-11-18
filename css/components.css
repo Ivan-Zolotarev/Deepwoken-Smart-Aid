@@ -37,6 +37,13 @@
   color: var(--gold-dim);
 }
 
+.lead--plain::first-letter {
+  float: none;
+  font: inherit;
+  padding: 0;
+  color: inherit;
+}
+
 /* Орнамент-разделитель */
 .ornament {
   display: flex;
@@ -197,6 +204,109 @@ a.card:hover {
   margin-bottom: 4px;
 }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* ---------- Каталог талантов ---------- */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin: 1.2em 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, .3);
+  border: 1px solid var(--parchment-2);
+  border-radius: var(--radius);
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field--wide { grid-column: 1 / -1; }
+.field > span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-0);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.field input, .field select {
+  width: 100%;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--parchment-0);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+}
+.btn--sm { padding: 8px 18px; font-size: var(--fs-1); }
+
+.count { color: var(--ink-soft); margin: 0 0 12px; }
+.more { text-align: center; margin-top: 20px; }
+.loading { color: var(--ink-soft); font-style: italic; }
+
+.card--talent { display: flex; flex-direction: column; gap: 2px; }
+.card--talent .card__title { margin: 6px 0 0; font-size: 1.3rem; }
+.card--talent .tag { align-self: flex-start; }
+.card__cat {
+  margin: 0 0 4px;
+  font-size: var(--fs-0);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.card__text--clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card__req { margin: 8px 0 0; font-size: var(--fs-0); font-weight: 700; color: var(--ink); }
+
+/* Редкость: цвет задаётся через --c */
+.rarity { --c: var(--ink-soft); color: var(--c); border-color: var(--c); }
+.rarity--common { --c: #6b5b45; }
+.rarity--rare { --c: #2f6ea5; }
+.rarity--advanced { --c: #6b4fb0; }
+.rarity--oath { --c: #9a7312; }
+.rarity--mantra-level { --c: #1d7a72; }
+.rarity--race { --c: #3f7d3a; }
+.rarity--quest { --c: #8a4a8f; }
+.rarity--faction { --c: #a03a3a; }
+.rarity--mastery { --c: #b5651d; }
+.rarity--origin { --c: #4a6b8a; }
+.rarity--echo { --c: #5a5a8a; }
+.rarity--equipment { --c: #5f6670; }
+
+.tag--link { text-decoration: none; transition: border-color .2s; }
+.page a.tag--link:hover { border-color: #1d6e67; }
+
+.meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 18px;
+  margin: 1.2em 0;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, .3);
+  border: 1px solid var(--parchment-2);
+  border-radius: var(--radius);
+}
+.meta dt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: var(--fs-0);
+  color: var(--ink-soft);
+  padding-top: 3px;
+}
+.meta dd { margin: 0; }
+@media (max-width: 600px) { .meta { grid-template-columns: 1fr; } }
+
+.info-list ul { margin: .3em 0; padding-left: 1.3em; }
+.info-list li { margin-bottom: .3em; }
+.info-list li::marker { color: var(--gold-dim); }
+.source { font-size: var(--fs-0); color: var(--ink-soft); }
 
 /* Колонки внутри разворота не разрываем */
 .page--spread > section { break-inside: avoid; }

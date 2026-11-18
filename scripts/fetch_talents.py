@@ -20,6 +20,7 @@ from wikitext import clean, find_templates, split_params  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = Path(__file__).parent / ".cache"
 OUT = ROOT / "data" / "talents.json"
+OUT_JS = ROOT / "data" / "talents.js"  # то же самое для сайта: грузится <script>, работает и с file://
 
 API = "https://deepwoken.fandom.com/api.php"
 PAGE = "Talents"
@@ -134,6 +135,13 @@ def main():
         "talents": talents,
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    OUT_JS.write_text(
+        "window.DEEPWOKEN_DATA = window.DEEPWOKEN_DATA || {};\n"
+        "window.DEEPWOKEN_DATA.talents = "
+        + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        + ";\n",
+        encoding="utf-8",
+    )
     print(f"Сохранено талантов: {len(talents)} -> {OUT.relative_to(ROOT)}")
 
 
