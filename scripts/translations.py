@@ -69,7 +69,31 @@ def cmd_batch(n, rarities):
         })
         if len(out) >= n:
             break
-    print(json.dumps(out, ensure_ascii=False, indent=1))
+    # по одному таланту в строке: компактно и удобно читать
+    for item in out:
+        print(json.dumps(item, ensure_ascii=False, separators=(",", ":")))
+
+
+def cmd_merge(path):
+    """Добавляет пачку переводов (JSON слаг -> перевод) в talents.ru.json и проставляет хэши."""
+    talents, tr = load_talents(), load_tr()
+    batch = json.loads(Path(path).read_text(encoding="utf-8"))
+    bad = 0
+    for slug, v in batch.items():
+        t = talents.get(slug)
+        if not t:
+            print("! нет таланта:", slug)
+            bad += 1
+            continue
+        if len(v.get("info", [])) != len(t["info"]):
+            print(f"! {slug}: пунктов info {len(v.get('info', []))}, в оригинале {len(t['info'])}, пропущен")
+            bad += 1
+            continue
+        v.setdefault("stats", "")
+        v["src"] = source_hash(t)
+        tr[slug] = v
+    TR_FILE.write_text(json.dumps(tr, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Добавлено: {len(batch) - bad}, отклонено: {bad}, всего переведено: {len(tr)}")
 
 
 def cmd_stamp():
@@ -137,6 +161,8 @@ def main():
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 25
         r = set(sys.argv[3].split(",")) if len(sys.argv) > 3 else set()
         cmd_batch(n, r)
+    elif cmd == "merge":
+        cmd_merge(sys.argv[2])
     elif cmd == "stamp":
         cmd_stamp()
     elif cmd == "build":
