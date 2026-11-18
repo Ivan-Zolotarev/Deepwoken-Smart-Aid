@@ -121,7 +121,7 @@ def parse_block(block):
     if after:
         result["afterwards"] = after
 
-    rew_raw = fields.get("rewards", "")
+    rew_raw = re.split(r"\{\{History|Category:", fields.get("rewards", ""))[0]
     result["rewards"] = clean(rew_raw).replace("\n", " ")
     result["reward_talents"] = talents_in(rew_raw)
     result["links"] = links(guide_raw)

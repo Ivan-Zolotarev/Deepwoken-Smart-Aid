@@ -7,6 +7,9 @@
   var talentSlugs = {};   // таланты, которые есть в каталоге: на них ставим ссылки
   var options = null;
   var loading = null;
+  var CONTACT = "cryptoknopka1@gmail.com";
+  var tr = {};            // русские переводы: slug -> {guide, rewards, afterwards}
+  function trans(x) { return I18N.lang === "ru" ? (tr[x.slug] || null) : null; }
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -20,13 +23,16 @@
 
   function init() {
     data = window.DEEPWOKEN_DATA.quests.quests;
+    if (window.DEEPWOKEN_DATA.questsRu) tr = window.DEEPWOKEN_DATA.questsRu;
     var tal = window.DEEPWOKEN_DATA.talents;
     if (tal) tal.talents.forEach(function (x) { talentSlugs[slugify(x.name)] = 1; });
     var loc = {};
     data.forEach(function (q) {
       bySlug[q.slug] = q;
+      var r = tr[q.slug];
       q.hay = (q.name + " " + q.locations.join(" ") + " " + q.rewards + " " + q.npcs.join(" ") + " " +
-        q.guide.map(function (g) { return g.text; }).join(" ")).toLowerCase();
+        q.guide.map(function (g) { return g.text; }).join(" ") +
+        (r ? " " + r.rewards + " " + r.guide.join(" ") : "")).toLowerCase();
       q.locations.forEach(function (l) { if (l.length > 1 && l !== "N/A") loc[l] = 1; });
     });
     options = {
@@ -52,8 +58,12 @@
             function () { init(); resolve(); },
             function () { loading = null; reject(new Error("quests.js")); });
         };
-        // Каталог талантов нужен только для ссылок из наград
-        addScript("data/talents.js", loadQuests, loadQuests);
+        // Переводы и каталог талантов (для ссылок из наград) необязательны
+        addScript("data/quests.ru.js", function () {
+          addScript("data/talents.js", loadQuests, loadQuests);
+        }, function () {
+          addScript("data/talents.js", loadQuests, loadQuests);
+        });
       });
     }
     return loading;
@@ -81,14 +91,16 @@
   }
 
   function cardHtml(x) {
-    var first = x.guide.length ? x.guide[0].text : "";
+    var T = trans(x);
+    var first = T ? T.guide[0] : (x.guide.length ? x.guide[0].text : "");
+    var rewards = T ? T.rewards : x.rewards;
     return '<a class="card card--talent" href="#/quests/' + x.slug + '">' +
       '<span class="tag">' + esc(kindLabel(x.kind)) + '</span> ' +
       '<span class="tag">' + esc(traitLabel(x.trait)) + '</span>' +
       '<h3 class="card__title">' + esc(x.name) + '</h3>' +
       '<p class="card__cat">' + esc(x.location_text) + '</p>' +
       '<p class="card__text card__text--clamp">' + esc(first) + '</p>' +
-      (x.rewards ? '<p class="card__req">' + esc(x.rewards) + '</p>' : "") +
+      (rewards ? '<p class="card__req">' + esc(rewards) + '</p>' : "") +
     '</a>';
   }
 
@@ -136,7 +148,10 @@
 
   function guideHtml(guide) {
     var html = "", inList = false;
-    guide.forEach(function (g) {
+    guide.forEach(function (g, i) {
+      // одиночный пункт среди абзацев — это примечание, не список
+      var alone = g.step && !(guide[i - 1] && guide[i - 1].step) && !(guide[i + 1] && guide[i + 1].step);
+      if (alone) g = { text: g.text, step: false };
       if (g.step && !inList) { html += "<ol>"; inList = true; }
       if (!g.step && inList) { html += "</ol>"; inList = false; }
       html += g.step ? "<li>" + esc(g.text) + "</li>" : "<p>" + esc(g.text) + "</p>";
@@ -148,6 +163,10 @@
   function detailView(slug) {
     var x = bySlug[decodeURIComponent(slug)];
     if (!x) return null;
+    var T = trans(x);
+    var guide = T ? x.guide.map(function (g, i) { return { text: T.guide[i], step: g.step }; }) : x.guide;
+    var rewards = T ? T.rewards : x.rewards;
+    var afterwards = T ? T.afterwards : x.afterwards;
     var talents = x.reward_talents.map(function (n) {
       var s = slugify(n);
       return talentSlugs[s]
@@ -156,7 +175,7 @@
     }).join("");
     var rows = [
       [t("quests.location"), x.location_text],
-      [t("quests.rewards"), x.rewards]
+      [t("quests.rewards"), rewards]
     ];
     if (x.npcs.length) rows.push([t("quests.npcs"), x.npcs.join(", ")]);
 
@@ -166,15 +185,17 @@
         '<p class="eyebrow"><a href="#/quests">' + esc(t("nav.quests")) + '</a> · ' + esc(kindLabel(x.kind)) + '</p>' +
         '<h1>' + esc(x.name) + '</h1>' +
         '<div class="row"><span class="tag">' + esc(traitLabel(x.trait)) + '</span></div>' +
-        (I18N.lang === "ru" ? '<div class="callout">' + esc(t("quests.en.note")) + '</div>' : "") +
+        (I18N.lang === "ru" && !T ? '<div class="callout">' + esc(t("quests.en.note")) + '</div>' : "") +
         '<div class="ornament" aria-hidden="true">❖</div>' +
         '<dl class="meta">' + rows.filter(function (r) { return r[1]; }).map(function (r) {
           return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>';
         }).join("") + '</dl>' +
         (talents ? '<h2>' + esc(t("quests.talents")) + '</h2><div class="row">' + talents + '</div>' : "") +
-        '<h2>' + esc(t("quests.guide")) + '</h2><div class="info-list">' + guideHtml(x.guide) + '</div>' +
-        (x.afterwards ? '<h2>' + esc(t("quests.afterwards")) + '</h2><p>' + esc(x.afterwards) + '</p>' : "") +
+        '<h2>' + esc(t("quests.guide")) + '</h2><div class="info-list">' + guideHtml(guide) + '</div>' +
+        (afterwards ? '<h2>' + esc(t("quests.afterwards")) + '</h2><p>' + esc(afterwards) + '</p>' : "") +
         '<div class="ornament" aria-hidden="true">❖</div>' +
+        (T ? '<p class="source">' + esc(t("talents.report")) + ' <a href="mailto:' + CONTACT +
+          '?subject=' + encodeURIComponent(t("talents.report.subject") + ": " + x.name) + '">' + CONTACT + '</a></p>' : "") +
         '<p class="source">' + esc(t("talents.source")) + ' <a href="https://deepwoken.fandom.com/wiki/Quests" target="_blank" rel="noopener">Deepwoken Wiki</a> (CC BY-SA 3.0).</p>' +
         '<p><a class="btn btn--ghost" href="#/quests">← ' + esc(t("quests.back")) + '</a></p>'
     };
