@@ -39,14 +39,15 @@
     }
 
     var section = P.SECTIONS.filter(function (s) { return s.id === route; })[0];
-    if (route === "talents") {
-      page = window.TALENTS_VIEW.render(r.arg);
+    var dataView = { talents: window.TALENTS_VIEW, quests: window.QUESTS_VIEW }[route];
+    if (dataView) {
+      page = dataView.render(r.arg);
       if (!page) {
-        page = { title: I18N.t("nav.talents"), html: '<p class="loading">' + I18N.t("loading") + "</p>" };
-        window.TALENTS_VIEW.load().then(function () {
-          if (currentRoute().name === "talents") render(focus);
+        page = { title: I18N.t("nav." + route), html: '<p class="loading">' + I18N.t("loading") + "</p>" };
+        dataView.load().then(function () {
+          if (currentRoute().name === route) render(focus);
         }, function () {
-          if (currentRoute().name === "talents") {
+          if (currentRoute().name === route) {
             view.innerHTML = '<div class="callout callout--warn">' + I18N.t("load.error") + "</div>";
           }
         });
