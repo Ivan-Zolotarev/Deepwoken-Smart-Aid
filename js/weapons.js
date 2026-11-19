@@ -2,11 +2,17 @@
 (function () {
   var I18N = window.I18N;
   var PAGE_SIZE = 60;
+  var CONTACT = "cryptoknopka1@gmail.com";
   var state = { q: "", cls: "", type: "", rarity: "", dmg: "", sort: "name", limit: PAGE_SIZE };
   var data = null;
   var bySlug = {};
   var options = null;
   var loading = null;
+  var tr = {};            // русские переводы: slug -> {description, special_effect}
+  var PLACEHOLDERS = ["", "...", "..", "tba", "tbd", "n/a", "na", "none", "?", "-", "???", '""'];
+  // Текст вики без заглушек вроде «...» и «TBA»
+  function real(s) { return PLACEHOLDERS.indexOf(String(s || "").trim().toLowerCase()) === -1 ? s : ""; }
+  function trans(x) { return I18N.lang === "ru" ? (tr[x.slug] || null) : null; }
   var RARITY_ORDER = ["Common", "Uncommon", "Rare", "Legendary", "Mythical", "Relic", "Unique", "Named"];
   // Коды статов в требованиях оружия
   var CODES = {
@@ -30,16 +36,20 @@
   }
   function reqText(raw) {
     var map = CODES[I18N.lang] || CODES.en;
-    return raw.replace(/\b(LHT|MED|HVY|STR|FTD)\b/g, function (m) { return map[m]; });
+    var out = raw.replace(/\b(LHT|MED|HVY|STR|FTD)\b/g, function (m) { return map[m]; });
+    return I18N.lang === "ru" ? out.replace(/\bOR\b/g, "или") : out;
   }
   function clsKey(x) { return x.class || "Other"; }
 
   function init() {
+    if (window.DEEPWOKEN_DATA.weaponsRu) tr = window.DEEPWOKEN_DATA.weaponsRu;
     data = window.DEEPWOKEN_DATA.weapons.weapons;
     var types = {}, rar = {}, dt = {};
     data.forEach(function (x) {
       bySlug[x.slug] = x;
-      x.hay = (x.name + " " + x.type + " " + x.description + " " + x.obtainment.join(" ")).toLowerCase();
+      var r = tr[x.slug];
+      x.hay = (x.name + " " + x.type + " " + x.description + " " + x.obtainment.join(" ") +
+        (r ? " " + (r.description || "") + " " + (r.special_effect || "") : "")).toLowerCase();
       if (x.type && x.type !== "?") types[x.type] = 1;
       if (x.rarity && x.rarity !== "?" && x.rarity !== "N/A") rar[x.rarity] = 1;
       if (x.damage_type && x.damage_type !== "?") dt[x.damage_type] = 1;
@@ -56,11 +66,20 @@
     if (data) return Promise.resolve();
     if (!loading) {
       loading = new Promise(function (resolve, reject) {
-        var s = document.createElement("script");
-        s.src = "data/weapons.js";
-        s.onload = function () { init(); resolve(); };
-        s.onerror = function () { loading = null; reject(new Error("weapons.js")); };
-        document.head.appendChild(s);
+        var addScript = function (src, ok, fail) {
+          var s = document.createElement("script");
+          s.src = src;
+          s.onload = ok;
+          s.onerror = fail;
+          document.head.appendChild(s);
+        };
+        var loadWeapons = function () {
+          addScript("data/weapons.js",
+            function () { init(); resolve(); },
+            function () { loading = null; reject(new Error("weapons.js")); });
+        };
+        // Переводы необязательны: без файла показываем оригинал
+        addScript("data/weapons.ru.js", loadWeapons, loadWeapons);
       });
     }
     return loading;
@@ -171,6 +190,8 @@
   function detailView(slug) {
     var x = bySlug[decodeURIComponent(slug)];
     if (!x) return null;
+    var T = trans(x);
+    var description = real(T && T.description ? T.description : x.description);
     var rows = [];
     function add(label, v) { if (v != null && v !== "" && v !== "?" && v !== "N/A") rows.push([label, String(v)]); }
     add(t("weapons.type"), x.type);
@@ -187,8 +208,9 @@
     add(t("weapons.price"), x.selling_price);
     var ex = x.extra || {};
     EXTRA_FIELDS.forEach(function (k) {
-      if (!ex[k]) return;
+      if (!real(ex[k])) return;
       var v = ex[k];
+      if (k === "special effect" && T && T.special_effect) v = T.special_effect;
       if (I18N.lang === "ru") v = v.replace(/^yes$/i, "Да").replace(/^no$/i, "Нет");
       add(lbl("weapons.extra", k), v);
     });
@@ -200,7 +222,8 @@
         '<p class="eyebrow"><a href="#/reference">' + esc(t("nav.reference")) + '</a> · <a href="#/reference/weapons">' + esc(t("weapons.title")) + '</a></p>' +
         '<h1>' + esc(x.name) + '</h1>' +
         '<div class="ornament" aria-hidden="true">❖</div>' +
-        (x.description ? '<p class="lead lead--plain">' + esc(x.description) + '</p>' : "") +
+        (description ? '<p class="lead lead--plain">' + esc(description) + '</p>' : "") +
+        (I18N.lang === "ru" && !T && description ? '<div class="callout">' + esc(t("weapons.untranslated")) + '</div>' : "") +
         '<dl class="meta">' + rows.map(function (r) {
           return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>';
         }).join("") + '</dl>' +
@@ -209,6 +232,8 @@
         (related.length ? '<h2>' + esc(t("weapons.related")) + '</h2><div class="row">' +
           related.map(function (o) { return '<a class="tag tag--link" href="#/reference/weapons/' + o.slug + '">' + esc(o.name) + '</a>'; }).join("") + '</div>' : "") +
         '<div class="ornament" aria-hidden="true">❖</div>' +
+        (T ? '<p class="source">' + esc(t("talents.report")) + ' <a href="mailto:' + CONTACT +
+          '?subject=' + encodeURIComponent(t("talents.report.subject") + ": " + x.name) + '">' + CONTACT + '</a></p>' : "") +
         '<p class="source">' + esc(t("talents.source")) + ' <a href="' + esc(x.wiki_url) + '" target="_blank" rel="noopener">Deepwoken Wiki</a> (CC BY-SA 3.0).</p>' +
         '<p><a class="btn btn--ghost" href="#/reference/weapons">← ' + esc(t("weapons.back")) + '</a></p>'
     };
