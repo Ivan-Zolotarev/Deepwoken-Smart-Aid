@@ -22,6 +22,25 @@
     }).join("");
   }
 
+  function referenceHub() {
+    var items = [
+      { href: "#/reference/weapons", title: I18N.t("weapons.title"), text: I18N.t("ref.weapons.desc") },
+      { title: I18N.t("ref.mantras"), text: I18N.t("ref.soon") }
+    ];
+    return {
+      title: I18N.t("nav.reference"),
+      html:
+        '<p class="eyebrow">' + I18N.t("nav.reference") + '</p>' +
+        '<h1>' + I18N.t("nav.reference") + '</h1>' +
+        '<p class="lead">' + I18N.t("sec.reference.desc") + '</p>' +
+        '<div class="grid">' + items.map(function (it) {
+          return it.href
+            ? '<a class="card card--talent" href="' + it.href + '"><h3 class="card__title">' + it.title + '</h3><p class="card__text">' + it.text + '</p></a>'
+            : '<div class="card card--talent"><h3 class="card__title">' + it.title + '</h3><p class="card__text">' + it.text + '</p></div>';
+        }).join("") + '</div>'
+    };
+  }
+
   function render(focus) {
     var r = currentRoute();
     var route = r.name;
@@ -40,8 +59,18 @@
 
     var section = P.SECTIONS.filter(function (s) { return s.id === route; })[0];
     var dataView = { talents: window.TALENTS_VIEW, quests: window.QUESTS_VIEW }[route];
-    if (dataView) {
-      page = dataView.render(r.arg);
+    var viewArg = r.arg;
+    // Справочник: «#/reference/weapons/<slug>»; без подраздела — оглавление справочника
+    if (route === "reference") {
+      var parts = r.arg.split("/");
+      if (parts[0] === "weapons") {
+        dataView = window.WEAPONS_VIEW;
+        viewArg = parts.slice(1).join("/");
+      }
+    }
+    if (route === "reference" && !dataView) page = referenceHub();
+    else if (dataView) {
+      page = dataView.render(viewArg);
       if (!page) {
         page = { title: I18N.t("nav." + route), html: '<p class="loading">' + I18N.t("loading") + "</p>" };
         dataView.load().then(function () {
