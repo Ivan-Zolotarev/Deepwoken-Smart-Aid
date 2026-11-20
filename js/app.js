@@ -25,7 +25,7 @@
   function referenceHub() {
     var items = [
       { href: "#/reference/weapons", title: I18N.t("weapons.title"), text: I18N.t("ref.weapons.desc") },
-      { title: I18N.t("ref.mantras"), text: I18N.t("ref.soon") }
+      { href: "#/reference/mantras", title: I18N.t("mantras.title"), text: I18N.t("ref.mantras.desc") }
     ];
     return {
       title: I18N.t("nav.reference"),
@@ -63,8 +63,9 @@
     // Справочник: «#/reference/weapons/<slug>»; без подраздела — оглавление справочника
     if (route === "reference") {
       var parts = r.arg.split("/");
-      if (parts[0] === "weapons") {
-        dataView = window.WEAPONS_VIEW;
+      var sub = { weapons: window.WEAPONS_VIEW, mantras: window.MANTRAS_VIEW }[parts[0]];
+      if (sub) {
+        dataView = sub;
         viewArg = parts.slice(1).join("/");
       }
     }
