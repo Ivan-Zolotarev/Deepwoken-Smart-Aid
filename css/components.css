@@ -328,3 +328,7 @@ a.card:hover {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+.field--check { flex-direction: row; align-items: center; gap: 8px; align-self: end; padding-bottom: 8px; }
+.field--check > span { text-transform: none; letter-spacing: 0; }
+.field--check input { width: auto; }

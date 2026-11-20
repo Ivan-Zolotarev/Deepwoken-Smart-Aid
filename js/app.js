@@ -58,7 +58,7 @@
     }
 
     var section = P.SECTIONS.filter(function (s) { return s.id === route; })[0];
-    var dataView = { talents: window.TALENTS_VIEW, quests: window.QUESTS_VIEW }[route];
+    var dataView = { talents: window.TALENTS_VIEW, quests: window.QUESTS_VIEW, islands: window.ISLANDS_VIEW }[route];
     var viewArg = r.arg;
     // Справочник: «#/reference/weapons/<slug>»; без подраздела — оглавление справочника
     if (route === "reference") {
